@@ -1,5 +1,6 @@
 import cv2
 import dlib
+from recognition import verifyFaces
 
 from utils import base64_to_image
 
@@ -69,8 +70,11 @@ def proctoring_model(image_path, shape_predictor_path):
 # Example usage
 
 shape_predictor_path = 'shape_predictor_68_face_landmarks.dat'
-def proctor(str1):
-    image = base64_to_image(str1)
+def proctor(str1,str2):
+    status = verifyFaces(str1,str2)
+    if not status:
+        raise Exception("Face Not Verified")
+    image = base64_to_image(str2)
     result = proctoring_model(image, shape_predictor_path)
     # print(result)
     return result

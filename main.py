@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
 from proctoring import proctor
 from recognition import verifyFaces
 
@@ -16,11 +16,17 @@ def first_example():
 def _verifyProfilePicture(
         data = Body(...)
 ):
-    print(data)
-    print(type(data))
-    return ({
-        "success":"true"
-    })
+    # print(data)
+    # print(type(data))
+    try:
+        img1 = data["image1"]
+        img2 = data["image2"]
+        status = verifyFaces(img1,img2)
+        return ({
+            "success":status
+        })  
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))
 
 @app.post('/proctor')
 def _proctorUser(
@@ -29,7 +35,12 @@ def _proctorUser(
     '''
     Send Base64 encoded image in each 5 second
     '''
-    print(data)
-    return ({
-        "success":"true"
-    })
+    try:
+        original = data["original"]
+        captured = data["captured"]
+        status = proctor(original,captured)
+        return ({
+            "status":status
+        })  
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=str(e))
